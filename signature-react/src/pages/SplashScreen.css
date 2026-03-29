@@ -1,0 +1,174 @@
+/* ── Splash root ─────────────────────────────────────────────────────────── */
+.splash-root {
+  position: fixed;
+  inset: 0;                          /* covers entire viewport */
+  z-index: 9999;
+
+  /* Background image set via inline style in the component (CRA-compatible) */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* Fade-in on mount */
+  opacity: 1;
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+/* Fade-out + slight scale when leaving */
+.splash-leave {
+  opacity: 0;
+  transform: scale(1.03);
+  pointer-events: none;
+}
+
+/* ── Dark overlay ────────────────────────────────────────────────────────── */
+.splash-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(10, 8, 30, 0.82) 0%,
+    rgba(20, 15, 50, 0.75) 50%,
+    rgba(10, 8, 30, 0.88) 100%
+  );
+}
+
+/* ── Content card ────────────────────────────────────────────────────────── */
+.splash-content {
+  position: relative;          /* above overlay */
+  z-index: 1;
+  text-align: center;
+  padding: 3rem 2rem;
+  max-width: 680px;
+  width: 100%;
+
+  /* Subtle glass card */
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(0, 255, 200, 0.18);
+  border-radius: 24px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+
+  /* Slide-up entrance */
+  animation: splashSlideUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes splashSlideUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* ── Badge ───────────────────────────────────────────────────────────────── */
+.splash-badge {
+  display: inline-block;
+  background: rgba(0, 255, 200, 0.12);
+  border: 1px solid rgba(0, 255, 200, 0.35);
+  color: #00ffc8;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 0.35rem 1rem;
+  border-radius: 50px;
+  margin-bottom: 1.6rem;
+}
+
+/* ── Title ───────────────────────────────────────────────────────────────── */
+.splash-title {
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.15;
+  margin-bottom: 1.2rem;
+  letter-spacing: -0.5px;
+}
+
+.splash-title-accent {
+  background: linear-gradient(135deg, #00ffc8, #00b4d8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Subtitle ────────────────────────────────────────────────────────────── */
+.splash-subtitle {
+  color: #b0b8c8;
+  font-size: clamp(0.95rem, 2vw, 1.1rem);
+  line-height: 1.7;
+  margin-bottom: 2.5rem;
+}
+
+/* ── CTA Button ──────────────────────────────────────────────────────────── */
+.splash-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+
+  background: linear-gradient(135deg, #00ffc8 0%, #00b4d8 100%);
+  color: #0a081e;
+  border: none;
+  padding: 1rem 2.4rem;
+  border-radius: 50px;
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+
+  box-shadow: 0 6px 30px rgba(0, 255, 200, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+
+  /* Pulse animation to draw attention */
+  animation: splashPulse 2.5s ease-in-out infinite;
+}
+
+@keyframes splashPulse {
+  0%, 100% { box-shadow: 0 6px 30px rgba(0, 255, 200, 0.35); }
+  50%       { box-shadow: 0 6px 45px rgba(0, 255, 200, 0.6);  }
+}
+
+.splash-btn:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 12px 40px rgba(0, 255, 200, 0.5);
+  filter: brightness(1.05);
+  animation: none;   /* stop pulse on hover */
+}
+
+.splash-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.splash-btn-icon { font-size: 1.2rem; }
+
+.splash-btn-arrow {
+  font-size: 1.1rem;
+  transition: transform 0.2s;
+}
+
+.splash-btn:hover .splash-btn-arrow {
+  transform: translateX(4px);
+}
+
+/* ── Footer hint ─────────────────────────────────────────────────────────── */
+.splash-hint {
+  margin-top: 2rem;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 0.78rem;
+  letter-spacing: 0.5px;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .splash-content {
+    padding: 2rem 1.2rem;
+    border-radius: 16px;
+  }
+
+  .splash-btn {
+    padding: 0.85rem 1.8rem;
+    font-size: 1rem;
+  }
+}

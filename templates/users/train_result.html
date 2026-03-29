@@ -1,0 +1,77 @@
+{% extends 'users/userbase.html' %}
+{% load static %}
+
+{% block contents %}
+<style>
+    body {
+        background: linear-gradient(135deg, #e0f7fa, #fce4ec);
+        font-family: 'Poppins', sans-serif;
+    }
+    .container {
+        max-width: 900px;
+        margin: 50px auto;
+        background: #ffffff;
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        animation: fadeIn 0.6s ease-in-out;
+    }
+
+    h1, h3 {
+        color: #2c3e50;
+        margin-bottom: 20px;
+    }
+
+    ul {
+        list-style-type: none;
+        padding-left: 0;
+    }
+
+    li {
+        font-size: 1.1rem;
+        margin-bottom: 10px;
+        color: #333333; /* Dark grey for good readability */
+    }
+    
+
+    img {
+        border: 2px solid #ccc;
+        border-radius: 10px;
+        margin-bottom: 30px;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<div class="container">
+    <h1>✅ Siamese Model Training Complete</h1>
+
+    <h3>📉 Training & Validation Loss</h3>
+    <img src="{% static graph_url %}" alt="Training Graph" style="width: 100%; max-width: 800px;" />
+
+    <h3>📌 Final Metrics</h3>
+    <p><strong>Final Training Loss:</strong> {{ train_loss|last }}</p>
+    <p><strong>Final Validation Loss:</strong> {{ val_loss|last }}</p>
+
+    <h3>📊 Model Performance</h3>
+    <ul>
+        <li><strong>Accuracy:</strong> {{ accuracy|floatformat:2 }}</li>
+        <li><strong>Precision:</strong> {{ precision|floatformat:2 }}</li>
+        <li><strong>Recall:</strong> {{ recall|floatformat:2 }}</li>
+        <li><strong>F1-Score:</strong> {{ f1_score|floatformat:2 }}</li>
+    </ul>
+
+    <h3>🧮 Confusion Matrix</h3>
+    <img src="{% static confusion_matrix_url %}" alt="Confusion Matrix" style="width: 100%; max-width: 800px;" />
+</div>
+
+{% endblock %}

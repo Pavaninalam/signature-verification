@@ -1,0 +1,144 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Signature Verification</title>
+
+    <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+
+    <style>
+        /* Basic Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+    
+        /* Page Background */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            background-image: url("{% static 'background3.jpg' %}"); /* Path to your background image */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: white;
+            min-height: 100vh;
+            display: flex;
+        }
+    
+        /* Sidebar (Navigation Bar) Styling */
+        nav {
+            width: 150px; /* Set fixed width */
+            padding: 10px 0;
+            box-shadow: 2px 0px 10px rgba(0, 0, 0, 0.5);
+            position: fixed;
+            height: 100%;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            background: rgba(0, 0, 0, 0.6); /* Darker shade */
+        }
+    
+        nav ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+    
+        nav ul li {
+            margin: 15px 0;
+        }
+    
+        nav ul li a {
+            text-decoration: none;
+            color: #f39c12; /* Lighter color for contrast */
+            font-size: 1.1rem;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+    
+        /* Hover and Active Effects */
+        nav ul li a:hover {
+            background: #34495e; /* Slightly lighter gray */
+            color: #fff;
+            transform: scale(1.1);
+        }
+    
+        nav ul li a.active {
+            background: #9b59b6; /* Purple for active link */
+            color: #fff;
+            font-style: italic;
+            transform: scale(1.1);
+        }
+    
+        /* Main Content Section */
+        main {
+            margin-left: 250px; /* Adjusted for sidebar */
+            flex: 1;
+            padding: 30px;
+            margin: 20px;
+            border-radius: 10px;
+            {% comment %} box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); {% endcomment %}
+        }
+    
+        /* Header Styling */
+        header {
+            background: rgba(213, 0, 109, 0.9);
+            color: #fff;
+            padding: 0px 0;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+    
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+    
+        /* Footer Styling */
+        footer {
+            background-color: rgba(44, 62, 80, 0.9);
+            color: #fff;
+            text-align: center;
+            padding: 10px 0;
+            font-size: 0.9rem;
+            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+        }
+    
+        footer p {
+            margin: 0;
+        }
+    </style>
+    
+</head>
+<body>
+    <!-- Sidebar (Navigation Bar) -->
+    <nav>
+        <ul>
+            <li><a href="{% url 'UserHome' %}" class="{% if request.path == '/UserHome/' %}active{% endif %}">Home</a></li>
+            {% comment %} <li><a href="{% url 'training' %}" class="{% if request.path == '/training/' %}active{% endif %}">Training</a></li> {% endcomment %}
+            <li><a href="{% url 'simulate_training' %}" class="{% if request.path == '/training/' %}active{% endif %}">Training</a></li>
+            <li><a href="{% url 'prediction1' %}" class="{% if request.path == '/prediction/' %}active{% endif %}">Verification</a></li>
+            <li><a href="{% url 'logout' %}" class="{% if request.path == '/index/' %}active{% endif %}">Logout</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content Section -->
+    <main>
+        {% block contents %}
+        <!-- Your content related to online signature verification will go here -->
+        {% endblock %}
+    </main>
+</body>
+</html>

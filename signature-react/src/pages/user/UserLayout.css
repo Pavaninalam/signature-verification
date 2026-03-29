@@ -1,0 +1,266 @@
+/* Shared layout for all user pages */
+.user-layout {
+  display: flex;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+}
+
+.user-main {
+  flex: 1;
+  margin-left: 200px;
+  padding: 2rem;
+  color: #fff;
+}
+
+.page-header {
+  margin-bottom: 2rem;
+}
+
+.page-header h1 {
+  font-size: 2rem;
+  color: #00ffc8;
+  margin-bottom: 0.3rem;
+}
+
+.page-header p {
+  color: #aaa;
+  font-size: 1rem;
+}
+
+/* Feature cards grid */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.feature-card {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(0,255,200,0.15);
+  border-radius: 16px;
+  padding: 2rem 1.5rem;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0,255,200,0.15);
+  border-color: rgba(0,255,200,0.4);
+}
+
+.card-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+
+.feature-card h3 {
+  color: #fff;
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.feature-card p {
+  color: #aaa;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin-bottom: 1.2rem;
+}
+
+.card-btn {
+  background: transparent;
+  color: #00ffc8;
+  border: 1px solid #00ffc8;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.card-btn:hover {
+  background: rgba(0,255,200,0.1);
+}
+
+/* Info card */
+.info-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px;
+  padding: 1.5rem 2rem;
+}
+
+.info-card h3 {
+  color: #00ffc8;
+  margin-bottom: 1rem;
+}
+
+.info-card ol {
+  color: #ccc;
+  line-height: 2;
+  padding-left: 1.2rem;
+}
+
+/* Prediction page */
+.predict-card {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(0,255,200,0.15);
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 700px;
+}
+
+.upload-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.upload-box {
+  background: rgba(255,255,255,0.04);
+  border: 2px dashed rgba(0,255,200,0.3);
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  transition: border-color 0.2s;
+}
+
+.upload-box:hover { border-color: #00ffc8; }
+
+.upload-box label {
+  color: #aaa;
+  font-size: 0.85rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.upload-box input[type="file"] {
+  color: #ccc;
+  font-size: 0.85rem;
+  width: 100%;
+}
+
+.upload-box img {
+  margin-top: 0.8rem;
+  max-width: 100%;
+  max-height: 120px;
+  border-radius: 8px;
+  object-fit: contain;
+}
+
+.result-box {
+  background: rgba(0,255,200,0.07);
+  border: 1px solid rgba(0,255,200,0.3);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.result-box .result-label {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.result-box .result-match   { color: #00ffc8; }
+.result-box .result-nomatch { color: #ff6b6b; }
+
+.result-meta {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  margin-top: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.result-meta span {
+  color: #aaa;
+  font-size: 0.9rem;
+}
+
+.result-meta strong { color: #fff; }
+
+.result-images {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.result-images div { text-align: center; }
+.result-images p { color: #aaa; font-size: 0.85rem; margin-bottom: 0.4rem; }
+.result-images img {
+  max-width: 180px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* Training page */
+.train-card {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(0,255,200,0.15);
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 800px;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.metric-box {
+  background: rgba(0,255,200,0.07);
+  border: 1px solid rgba(0,255,200,0.2);
+  border-radius: 12px;
+  padding: 1.2rem;
+  text-align: center;
+}
+
+.metric-box .metric-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #00ffc8;
+}
+
+.metric-box .metric-label {
+  color: #aaa;
+  font-size: 0.8rem;
+  margin-top: 0.3rem;
+}
+
+.graphs-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.graphs-row div { text-align: center; }
+.graphs-row p { color: #aaa; font-size: 0.85rem; margin-bottom: 0.5rem; }
+.graphs-row img {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.dataset-info {
+  background: rgba(255,255,255,0.04);
+  border-radius: 10px;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1.5rem;
+  color: #aaa;
+  font-size: 0.9rem;
+  line-height: 1.8;
+}
+
+.dataset-info strong { color: #00ffc8; }
+
+@media (max-width: 768px) {
+  .user-main { margin-left: 0; padding: 1rem; margin-top: 120px; }
+  .upload-row { grid-template-columns: 1fr; }
+  .graphs-row { grid-template-columns: 1fr; }
+}

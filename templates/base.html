@@ -1,0 +1,88 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <title>Signature Verification Using Siamese Network</title>
+    <style>
+        body {
+            display: flex;
+            min-height: 100vh;
+            margin: 0;
+            background-image: url("{% static 'background1.jpg' %}");
+            background-size: cover;
+            background-position: center;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .sidebar {
+            min-width: 250px;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            position: fixed;
+            height: 100%;
+        }
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+            margin-left: 270px;
+            background-color: transparent;
+            border-radius: 10px;
+        }
+        .nav-link {
+            margin-bottom: 10px;
+            color: white;
+            font-weight: bold;
+            padding: 15px 25px;
+            border-radius: 15px;
+            background-size: cover;
+            background-position: center;
+            transition: background-color 0.3s, color 0.3s, border 0.3s, transform 0.2s;
+        }
+        .nav-link.home { background-image: url("{% static 'backgro1und1.jpg' %}"); }
+        .nav-link.user-login { background-image: url("{% static 'ba1ckground2.jpg' %}"); }
+        .nav-link.admin-login { background-image: url("{% static 'ba1ckground3.jpg' %}"); }
+        .nav-link.create-account { background-image: url("{% static '1background4.jpg' %}"); }
+
+        .nav-link:hover {
+            color: #FFD700;
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        h2 {
+            color: #00ffc8;
+            font-weight: bold;
+            line-height: 1.5;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+        }
+
+  
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2><br>Signature<br>Verification<br></h2>
+        <div class="nav flex-column">
+            <a class="nav-link home" href="{% url 'index' %}">Home</a>
+            <a class="nav-link user-login" href="{% url 'UserLogin' %}">User Login</a>
+            <a class="nav-link admin-login" href="{% url 'AdminLogin' %}">Admin Login</a>
+            <a class="nav-link create-account" href="{% url 'UserRegisterForm' %}">Create Account</a>
+        </div>
+    </div>
+    
+    <div class="content">
+        {% block contents %}
+        {% endblock %}
+    </div>
+
+
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

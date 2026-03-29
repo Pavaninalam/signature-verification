@@ -1,0 +1,17 @@
+# Node / Python
+node_modules/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Django
+db.sqlite3
+.env
+media/
+staticfiles/
+
+# Keras / model
+*.h5
+.keras/
+*.ckpt

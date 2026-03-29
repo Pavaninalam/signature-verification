@@ -1,0 +1,86 @@
+
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Signature Verification</title>
+
+    <style>
+        /* Background Styling */
+        body {
+            background-image: url("{% static 'background1.jpg' %}"); /* Replace 'background_image.jpg' with the actual filename */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            font-family: Arial, sans-serif;
+            color: #333;
+            margin: 0;
+        }
+
+        /* Main Content Styling */
+        .homepage-content {
+            text-align: center;
+            color: #333;
+            background: rgba(255, 255, 255, 0.9); /* Semi-transparent background */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 100px auto; /* Center content with margin */
+            max-width: 600px;
+        }
+
+        .homepage-content h2 {
+            font-family:Times New Roman;
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: black;
+        }
+
+        .homepage-content p {
+            font-family:Times New Roman;
+            color:green;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        /* Links Styling */
+        .homepage-links {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .homepage-links .button {
+            display: inline-block;
+            background-color: #6C3483;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+
+        .homepage-links .button:hover {
+            background-color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+    <div class="homepage-content">
+        <h2>Online Signature Verification</h2>
+        <p>Verify signatures with our tool powered by machine learning. Upload a signature image to check if it matches the registered signature or sign up to start using the tool.</p>
+
+        <div class="homepage-links">
+            <a href="{% url 'simulate_training' %}" class="button">Train the Model</a>
+            <a href="{% url 'prediction1' %}" class="button">Start Verification</a>
+            <a href="{% url 'index' %}" class="button">Logout</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block contents %}
+{% load static %}
+
+<style>
+    .container {
+        background-color: rgba(0, 0, 0, 0.6); 
+        padding: 40px;
+        border-radius: 20px;
+        text-align: center;
+        max-width: 700px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.9);
+        margin: auto;
+        margin-top: 100px;
+    }
+
+    h1 {
+        font-size: 2.8rem;
+        color: #00ffc8; 
+        margin-bottom: 20px;
+        text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8);
+    }
+
+    p {
+        font-size: 1.2rem;
+        color: #ffffff;
+        margin-bottom: 30px;
+        line-height: 1.6;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border: none;
+        color: white;
+        border-radius: 8px;
+        padding: 12px 25px;
+        font-size: 1rem;
+        transition: background-color 0.3s, transform 0.2s;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+        transform: scale(1.05);
+    }
+</style>
+
+<div class="container">
+    <h1>Signature Verification Using Siamese Network</h1>
+    <p>Authenticate and verify signatures using deep learning. Our Siamese Network-based system compares signatures with high accuracy. Start by uploading your images or register for access.</p>
+    <a href="{% url 'UserRegisterForm' %}" class="btn btn-primary">Get Started</a>
+</div>
+
+{% endblock %}

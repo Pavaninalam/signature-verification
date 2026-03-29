@@ -1,0 +1,222 @@
+{% extends 'users/userbase.html' %}
+{% load static %}
+
+{% block contents %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signature Match Checker</title>
+    <style>
+        /* Reset default styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            height: 100%; /* Ensure body takes full height */
+            overflow: visible; /* Enable scrolling on the entire page */
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: url("{% static 'background1.jpg' %}") no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(0, 0, 0, 0.6); /* Slight opacity for background */
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            max-width: 700px;
+            width: 100%;
+            text-align: center;
+            animation: fadeIn 0.8s ease-in-out;
+            margin-left: 250px;
+            max-height: 100vh; /* Limit height of container */
+            overflow-y: auto; /* Enable scrolling if content exceeds max height */
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #3b82f6;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        h1::before {
+            content: "🔍";
+            font-size: 2rem;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            text-align: left;
+        }
+
+        label {
+            font-size: 1.1rem;
+            color:rgb(192, 243, 74);
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 1rem;
+            color: #374151;
+            background: #f9fafb;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="file"]:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        button {
+            background: #3b82f6;
+            color: #ffffff;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        button:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        h2 {
+            margin-top: 30px;
+            font-size: 1.5rem;
+            color:rgb(63, 72, 45);
+            background: #f3f4f6;
+            padding: 15px;
+            border-radius: 10px;
+            animation: slideIn 0.5s ease-in-out;
+        }
+
+        .signature-images {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-evenly;
+            gap: 20px;
+        }
+
+        .signature-images div {
+            text-align: center;
+        }
+
+        .signature-images img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            button {
+                font-size: 1rem;
+                padding: 10px;
+            }
+
+            .signature-images {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>Signature Match Checker</h1>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Check Match</button>
+        </form>
+
+        {% if result %}
+            <h2>Result: {{ result }}</h2>
+            <p><strong>Euclidean Distance:</strong> {{ distance }}</p>
+            <p><strong>Contrastive Loss:</strong> {{ loss }}</p>
+
+            <div class="signature-images">
+                <div>
+                    <h4>Signature 1:</h4>
+                    <img src="{{ img1_url }}" alt="Signature 1" />
+                </div>
+                <div>
+                    <h4>Signature 2:</h4>
+                    <img src="{{ img2_url }}" alt="Signature 2" />
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</body>
+
+</html>
+{% endblock %}

@@ -1,0 +1,187 @@
+{% extends 'users/userbase.html' %}
+{% load static %}
+
+{% block contents %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signature Verifier Simulation</title>
+    <style>
+        /* Basic Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Body and Background */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* Title Styling */
+        h1 {
+            font-size: 2.5rem;
+            color:yellow;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        h2 {
+            font-size: 2rem;
+            color: #2980b9;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        /* Button Styling */
+        button {
+            background-color: #2980b9;
+            color: white;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #3498db;
+        }
+
+        /* Form Styling */
+        form {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        /* Dataset Paths and Evaluation Metrics */
+        .dataset-paths,
+        .evaluation-metrics {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            width: 80%;
+            max-width: 700px;
+        }
+
+        .dataset-paths ul {
+            list-style-type: none;
+        }
+
+        .dataset-paths li,
+        .evaluation-metrics p {
+            margin: 10px 0;
+            font-size: 1.1rem;
+            color:rgb(235, 238, 240);
+        }
+
+        .dataset-paths li strong,
+        .evaluation-metrics p strong {
+            color: #2980b9;
+        }
+
+        /* Image Styling */
+        .image-container {
+            display: flex;
+            justify-content: center; /* Center images horizontally */
+            margin-top: 30px;
+            width: 90%; /* Allow more width for images */
+            max-width: 1000px; /* Set a max-width for better scaling */
+            gap: 30px; /* Add space between images */
+        }
+        
+        .image-container img {
+            width: 78%; /* Increase width to make images larger */
+            height: auto;
+            border-radius: 15px; /* Round the corners more */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); /* More prominent shadow for a cleaner look */
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out; /* Smooth transition on hover */
+        }
+        
+        .image-container img:hover {
+            transform: scale(1.05); /* Slight zoom effect on hover */
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3); /* Enhanced shadow effect on hover */
+        }
+        
+        /* Optional: Image caption styling */
+        .image-caption {
+            text-align: center;
+            font-size: 1.1rem;
+            color: yellow;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        
+
+        /* Adjusting for smaller screens */
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            button {
+                font-size: 1rem;
+                padding: 10px 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🖊️ Signature Verification Training Metrics</h1>
+
+    {% if not trained %}
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit">Click Here</button>
+        </form>
+    {% else %}
+        <div class="dataset-paths">
+            <h2>📁 Dataset Paths</h2>
+            <ul>
+                <li><strong>Genuine Signatures:</strong> {{ dataset_paths.genuine_path }}</li>
+                <li><strong>Forged Signatures:</strong> {{ dataset_paths.forged_path }}</li>
+            </ul>
+        </div>
+
+        <div class="evaluation-metrics">
+            <h2>📈 Evaluation Metrics</h2>
+            <p><strong>Accuracy:</strong> {{ accuracy }}</p>
+            <p><strong>Precision:</strong> {{ precision }}</p>
+            <p><strong>Recall:</strong> {{ recall }}</p>
+            <p><strong>AUC:</strong> {{ auc }}</p>
+        </div>
+
+        <!-- Display Confusion Matrix and Training Graph -->
+        <div class="image-container">
+            <div class="image">
+                <h2>📊 Confusion Matrix</h2>
+                <img src="{% static 'confusion_matrix.png' %}" alt="Confusion Matrix">
+            </div>
+            <div class="image">
+                <h2>📈 Training Graph</h2>
+                <img src="{% static 'training_graph.png' %}" alt="Training Graph">
+            </div>
+        </div>
+    {% endif %}
+</body>
+
+</html>
+{% endblock %}
