@@ -84,3 +84,12 @@ urlpatterns = [
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 # Serve Django's own static files (training graphs, etc.) under /django-static/
 urlpatterns += static(settings.STATIC_URL, document_root=settings.BASE_DIR / 'static')
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('register/', views.UserRegisterView.as_view()),
+    path('login/', views.UserLoginView.as_view()),
+    path('predict/', views.PredictionView.as_view()),
+    path('train/', views.SimulateTrainingView.as_view()),
+]

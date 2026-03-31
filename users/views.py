@@ -158,3 +158,106 @@ class PredictionView(APIView):
 
         except Exception as e:
             return Response({"error": str(e)}, status=500)
+            from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.permissions import AllowAny
+from rest_framework.parsers import MultiPartParser, FormParser
+
+from .serializers import (
+    UserRegistrationSerializer,
+    UserLoginSerializer,
+    SignatureSerializer
+)
+
+from .models import UserRegistrationModel
+from .predictor import preprocess, compute_similarity
+
+import jwt
+from datetime import datetime, timedelta
+from django.conf import settings
+
+# ---------------- JWT ----------------
+SECRET_KEY = settings.SECRET_KEY
+
+def generate_token(user):
+    payload = {
+        'id': user.id,
+        'loginid': user.loginid,
+        'exp': datetime.utcnow() + timedelta(hours=24),
+    }
+    return jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+
+
+def decode_token(token):
+    try:
+        return jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
+    except:
+        return None
+
+
+# ---------------- REGISTER ----------------
+class UserRegisterView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = UserRegistrationSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message': 'Registered'}, status=201)
+        return Response(serializer.errors, status=400)
+
+
+# ---------------- LOGIN ----------------
+class UserLoginView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = UserLoginSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=400)
+
+        loginid = serializer.validated_data['loginid']
+        password = serializer.validated_data['password']
+
+        try:
+            user = UserRegistrationModel.objects.get(loginid=loginid, password=password)
+        except:
+            return Response({'error': 'Invalid credentials'}, status=401)
+
+        return Response({
+            'token': generate_token(user)
+        })
+
+
+# ---------------- PREDICT ----------------
+class PredictionView(APIView):
+    parser_classes = [MultiPartParser, FormParser]
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        try:
+            img1_file = request.FILES['image1']
+            img2_file = request.FILES['image2']
+
+            img1 = preprocess(img1_file)
+            img2 = preprocess(img2_file)
+
+            result = compute_similarity(img1, img2)
+
+            return Response(result, status=200)
+
+        except Exception as e:
+            return Response(
+                {'error': f'Prediction failed: {str(e)}'},
+                status=500
+            )
+
+
+# ---------------- TRAIN (DUMMY) ----------------
+class SimulateTrainingView(APIView):
+    def post(self, request):
+        return Response({
+            "trained": True,
+            "accuracy": 95
+        })
