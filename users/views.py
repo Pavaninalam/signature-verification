@@ -79,21 +79,12 @@ class PredictionView(APIView):
             img1 = preprocess(img1_file)
             img2 = preprocess(img2_file)
 
-            result = compute_similarity(img1, img2)
+            sim = compute_similarity(img1, img2)
 
-            return Response(result, status=200)
+            return Response(sim, status=200)
 
         except Exception as e:
             return Response(
                 {'error': f'Prediction failed: {str(e)}'},
                 status=500
             )
-
-
-# ---------------- TRAIN ----------------
-class SimulateTrainingView(APIView):
-    def post(self, request):
-        return Response({
-            "trained": True,
-            "accuracy": 95
-        })

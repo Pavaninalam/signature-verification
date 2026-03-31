@@ -45,7 +45,10 @@ ROOT_URLCONF = 'Signature_Verification.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+
+        # 🔥 CHANGE HERE
+        'DIRS': [BASE_DIR / 'build'],  
+
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -57,7 +60,6 @@ TEMPLATES = [
         },
     },
 ]
-
 WSGI_APPLICATION = 'Signature_Verification.wsgi.application'
 
 # ------------------ DATABASE ------------------

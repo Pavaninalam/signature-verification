@@ -5,13 +5,8 @@ import cv2
 def preprocess(image_file):
     img = Image.open(image_file).convert('L')
     img = np.array(img)
-
-    # Resize
     img = cv2.resize(img, (300, 150))
-
-    # Binary threshold
     _, img = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
-
     return img
 
 
@@ -29,5 +24,5 @@ def compute_similarity(img1, img2):
         "distance": float(score),
         "similarity": float(100 - score),
         "confidence": float(max(0, 100 - score)),
-        "metrics": {"difference_score": float(score)}
+        "metrics": {"diff_score": float(score)}
     }
