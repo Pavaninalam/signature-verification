@@ -24,7 +24,7 @@ INSTALLED_APPS = [
     'users',
     'admins',
 ]
-
+DEBUG = True
 # ------------------ MIDDLEWARE ------------------
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
