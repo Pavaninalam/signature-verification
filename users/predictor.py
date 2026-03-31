@@ -6,10 +6,10 @@ def preprocess(image_file):
     img = Image.open(image_file).convert('L')
     img = np.array(img)
 
-    # resize
+    # Resize
     img = cv2.resize(img, (300, 150))
 
-    # threshold
+    # Binary threshold
     _, img = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
 
     return img
