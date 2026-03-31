@@ -12,5 +12,5 @@ def home(request):
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/users/', include('users.urls')),
-    path('', home),
+    path('', home,name='index'),
 ]
