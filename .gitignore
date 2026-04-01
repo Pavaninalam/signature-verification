@@ -1,17 +1,56 @@
-# Node / Python
-node_modules/
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
 *.pyo
 *.pyd
+.Python
+*.egg-info/
+.venv/
+venv/
+env/
 
 # Django
 db.sqlite3
 .env
-media/
+*.env
 staticfiles/
 
-# Keras / model
+# Media uploads (large, not needed in repo)
+media/image1*
+media/image2*
+media/signatures/
+
+# ML model (too large for git)
+*.keras
 *.h5
-.keras/
 *.ckpt
+*.pb
+users/model/
+
+# React build (served by Django, not needed in git for Render)
+signature-react/node_modules/
+signature-react/build/
+signature-react/.env.local
+
+# Expo mobile app (not deployed to Render)
+sigverify-mobile/node_modules/
+sigverify-mobile/.expo/
+
+# Static collected files
+staticfiles/
+static/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# ngrok / QR
+qr_code.png
+ngrok.yml
+
+# Logs
+*.log
