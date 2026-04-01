@@ -2,14 +2,9 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('login/', views.admin_login_view, name='AdminLogin'),
-    path('home/', views.admin_home_view, name='AdminHome'),
-
-    path('users/', views.view_users, name='viewUsers'),
-
-    # ✅ FIX ADDED HERE
-    path('home/userDetails/', views.view_users, name='userDetails'),
-
-    path('activate/<int:user_id>/', views.activate_user, name='activateUser'),
-    path('delete/<int:user_id>/', views.delete_user, name='deleteUser'),
+    # DRF API endpoints (used by React frontend)
+    path('login/',                        views.AdminLoginView.as_view(),      name='api-admin-login'),
+    path('users/',                        views.RegisteredUsersView.as_view(), name='api-admin-users'),
+    path('users/<int:user_id>/activate/', views.ActivateUserView.as_view(),    name='api-admin-activate'),
+    path('users/<int:user_id>/delete/',   views.DeleteUserView.as_view(),      name='api-admin-delete'),
 ]

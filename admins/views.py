@@ -75,10 +75,14 @@ class AdminLoginView(APIView):
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        loginid = serializer.validated_data['loginid']
+        loginid  = serializer.validated_data['loginid'].strip()
         password = serializer.validated_data['password']
 
-        if loginid == self.ADMIN_ID and password == self.ADMIN_PW:
+        # Read credentials fresh from settings (supports env var overrides)
+        admin_id = getattr(settings, 'ADMIN_LOGIN_ID', 'admin')
+        admin_pw = getattr(settings, 'ADMIN_PASSWORD', 'admin')
+
+        if loginid == admin_id and password == admin_pw:
             token = generate_admin_token()
             return Response({'token': token}, status=status.HTTP_200_OK)
 
@@ -163,9 +167,11 @@ ADMIN_PW = getattr(settings, 'ADMIN_PASSWORD', 'admin')
 
 def admin_login_view(request):
     if request.method == 'POST':
-        loginid = request.POST.get('loginid', '')
+        loginid  = request.POST.get('loginid', '').strip()
         password = request.POST.get('pswd', '')
-        if loginid == ADMIN_ID and password == ADMIN_PW:
+        admin_id = getattr(settings, 'ADMIN_LOGIN_ID', 'admin')
+        admin_pw = getattr(settings, 'ADMIN_PASSWORD', 'admin')
+        if loginid == admin_id and password == admin_pw:
             request.session['admin'] = True
             return redirect('AdminHome')
         messages.error(request, 'Invalid admin credentials.')
