@@ -65,7 +65,7 @@
 <section class="content">
     <div class="container">
         <h2 class="user-login-heading">User Login</h2>
-        <form action="{% url 'UserLoginCheck' %}" method="POST">
+        <form action="{% url 'UserLogin' %}" method="POST">
             {% csrf_token %}
             <div class="form-group">
                 <input type="text" class="form-control" name="loginid" required placeholder="Enter Login ID">

@@ -58,7 +58,7 @@
 <section class="content">
     <div class="container">
         <h2 class="admin-login-heading">Admin Login</h2>
-        <form action="AdminLogincheck" method="POST">
+        <form action="{% url 'AdminLogin' %}" method="POST">
             {% csrf_token %}
             <div class="form-group">
                 <input type="text" class="form-control" name="loginid" required placeholder="Enter Login ID">

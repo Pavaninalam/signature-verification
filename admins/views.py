@@ -1,11 +1,12 @@
 """
 admins/views.py
-Admin API endpoints using Django REST Framework.
-Replaces the old template-based admin views.
+Admin API endpoints (DRF) + template-based views.
 """
 import jwt
 from datetime import datetime, timedelta
 
+from django.shortcuts import render, redirect
+from django.contrib import messages
 from django.conf import settings
 
 from rest_framework.views import APIView
@@ -152,3 +153,59 @@ class DeleteUserView(APIView):
             {'message': f'User "{loginid}" has been deleted.'},
             status=status.HTTP_200_OK
         )
+
+
+# ── Template-based admin views ────────────────────────────────────────────────
+
+ADMIN_ID = getattr(settings, 'ADMIN_LOGIN_ID', 'admin')
+ADMIN_PW = getattr(settings, 'ADMIN_PASSWORD', 'admin')
+
+
+def admin_login_view(request):
+    if request.method == 'POST':
+        loginid = request.POST.get('loginid', '')
+        password = request.POST.get('pswd', '')
+        if loginid == ADMIN_ID and password == ADMIN_PW:
+            request.session['admin'] = True
+            return redirect('AdminHome')
+        messages.error(request, 'Invalid admin credentials.')
+    return render(request, 'AdminLogin.html')
+
+
+def admin_home_view(request):
+    if not request.session.get('admin'):
+        return redirect('AdminLogin')
+    users = UserRegistrationModel.objects.all()
+    return render(request, 'admins/AdminHome.html', {'users': users})
+
+
+def view_users(request):
+    if not request.session.get('admin'):
+        return redirect('AdminLogin')
+    users = UserRegistrationModel.objects.all()
+    return render(request, 'admins/viewregisterusers.html', {'users': users})
+
+
+def activate_user(request, user_id):
+    if not request.session.get('admin'):
+        return redirect('AdminLogin')
+    try:
+        user = UserRegistrationModel.objects.get(id=user_id)
+        user.status = 'activated'
+        user.save()
+        messages.success(request, f'User {user.loginid} activated.')
+    except UserRegistrationModel.DoesNotExist:
+        messages.error(request, 'User not found.')
+    return redirect('viewUsers')
+
+
+def delete_user(request, user_id):
+    if not request.session.get('admin'):
+        return redirect('AdminLogin')
+    try:
+        user = UserRegistrationModel.objects.get(id=user_id)
+        user.delete()
+        messages.success(request, 'User deleted.')
+    except UserRegistrationModel.DoesNotExist:
+        messages.error(request, 'User not found.')
+    return redirect('viewUsers')
