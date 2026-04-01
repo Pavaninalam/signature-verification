@@ -1,13 +1,13 @@
-"""
-admins/urls.py
-URL patterns for all admin API endpoints.
-"""
 from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('login/',                          views.AdminLoginView.as_view(),      name='admin-login'),
-    path('users/',                          views.RegisteredUsersView.as_view(), name='admin-users'),
-    path('users/<int:user_id>/activate/',   views.ActivateUserView.as_view(),    name='admin-activate-user'),
-    path('users/<int:user_id>/delete/',     views.DeleteUserView.as_view(),      name='admin-delete-user'),
+    path('login/', views.AdminLoginView, name='AdminLogin'),
+    path('home/', views.AdminHomeView, name='AdminHome'),
+
+    path('users/', views.viewUsers, name='viewUsers'),
+    path('home/userDetails/', views.viewUsers, name='userDetails'),  # ✅ ADD THIS
+
+    path('activate/<int:user_id>/', views.activateUser, name='activateUser'),
+    path('delete/<int:user_id>/', views.deleteUser, name='deleteUser'),
 ]
