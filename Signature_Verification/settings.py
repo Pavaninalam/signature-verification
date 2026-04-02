@@ -55,16 +55,13 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'Signature_Verification.wsgi.application'
-
-DATABASE_URL = os.environ.get('DATABASE_URL')
-if DATABASE_URL:
-    import dj_database_url
-    DATABASES = {'default': dj_database_url.config(default=DATABASE_URL, conn_max_age=600)}
-else:
+import dj_database_url
+import os
 
 DATABASES = {
     'default': dj_database_url.config(
-        default=os.environ.get('DATABASE_URL')
+        default=os.environ.get('DATABASE_URL'),
+        conn_max_age=600
     )
 }
 
