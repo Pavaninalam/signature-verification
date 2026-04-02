@@ -1,0 +1,8 @@
+* text=auto
+
+requirements.txt text eol=lf encoding=utf-8
+*.py text eol=lf encoding=utf-8
+*.sh text eol=lf encoding=utf-8
+Procfile text eol=lf encoding=utf-8
+runtime.txt text eol=lf encoding=utf-8
+build.sh text eol=lf encoding=utf-8
