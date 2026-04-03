@@ -193,27 +193,31 @@
 <body>
     <div class="container">
         <h1>Signature Match Checker</h1>
-        <form method="post" enctype="multipart/form-data">
+        <form method="post" enctype="multipart/form-data" action="{% url 'predict' %}">
             {% csrf_token %}
-            {{ form.as_p }}
+            <div class="form-group">
+                <label for="image1">Original Signature</label>
+                <input type="file" id="image1" name="image1" accept="image/*" required>
+            </div>
+            <div class="form-group">
+                <label for="image2">Test / Forged Signature</label>
+                <input type="file" id="image2" name="image2" accept="image/*" required>
+            </div>
             <button type="submit">Check Match</button>
         </form>
 
+        {% if messages %}
+            {% for message in messages %}
+                <p style="color:red; margin-top:10px;">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+
         {% if result %}
             <h2>Result: {{ result }}</h2>
-            <p><strong>Euclidean Distance:</strong> {{ distance }}</p>
+            <p><strong>Similarity Score:</strong> {{ similarity|floatformat:2 }}%</p>
+            <p><strong>Distance:</strong> {{ distance }}</p>
+            <p><strong>Confidence:</strong> {{ confidence }}</p>
             <p><strong>Contrastive Loss:</strong> {{ loss }}</p>
-
-            <div class="signature-images">
-                <div>
-                    <h4>Signature 1:</h4>
-                    <img src="{{ img1_url }}" alt="Signature 1" />
-                </div>
-                <div>
-                    <h4>Signature 2:</h4>
-                    <img src="{{ img2_url }}" alt="Signature 2" />
-                </div>
-            </div>
         {% endif %}
     </div>
 </body>

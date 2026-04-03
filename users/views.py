@@ -352,7 +352,7 @@ def logout_view(request):
 def PredictView(request):
     if 'loginid' not in request.session:
         return redirect('UserLogin')
-    result = None
+    context = {}
     if request.method == 'POST':
         try:
             img1_file = request.FILES.get('image1')
@@ -360,12 +360,17 @@ def PredictView(request):
             if not img1_file or not img2_file:
                 messages.error(request, 'Please upload both images.')
             else:
-                img1   = preprocess(img1_file)
-                img2   = preprocess(img2_file)
-                result = compute_similarity(img1, img2)
+                img1 = preprocess(img1_file)
+                img2 = preprocess(img2_file)
+                sim  = compute_similarity(img1, img2)
+                context['result']     = sim.get('result', 'Unknown')
+                context['distance']   = sim.get('distance', 0)
+                context['similarity'] = sim.get('similarity', 0)
+                context['confidence'] = sim.get('confidence', '')
+                context['loss']       = round(float(sim.get('distance', 0) ** 2), 6)
         except Exception as e:
             messages.error(request, f'Prediction error: {str(e)}')
-    return render(request, 'users/prediction.html', {'result': result})
+    return render(request, 'users/prediction.html', context)
 
 
 def forgot_password(request):
