@@ -91,8 +91,8 @@
 
 <nav>
     <ul>
-        <li><a href="AdminHome">Home</a></li>
-        <li><a href="userDetails">User Details</a></li>
+        <li><a href="{% url 'AdminHome' %}">Home</a></li>
+        <li><a href="{% url 'userDetails' %}">User Details</a></li>
         <li><a href="{% url 'index' %}">Logout</a></li>
     </ul>
 </nav>
@@ -100,7 +100,7 @@
 {% block contents %}
 {% endblock %}
 <footer>
-    <p>&copy; 2026 Developed by | Saikumar. All rights reserved.</p>
+    <p>&copy; 2026 Developed by | Pavani. All rights reserved.</p>
 </footer> 
 
 </body>
