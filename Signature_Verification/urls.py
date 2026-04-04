@@ -28,6 +28,7 @@ urlpatterns = [
     path('logout/',                             user_views.logout_view,          name='logout'),
     path('home/',                               user_views.UserHome,             name='UserHome'),
     path('predict/',                            user_views.PredictView,          name='predict'),
+    path('train/',                              user_views.TrainView,            name='train'),
     path('forgot-password/',                    user_views.forgot_password,      name='forgot_password'),
     path('verify-otp/',                         user_views.verify_otp,           name='verify_otp'),
     path('reset-password/',                     user_views.reset_password_view,  name='reset_password'),

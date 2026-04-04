@@ -3,75 +3,57 @@
 
 {% block contents %}
 <style>
-    body {
-        background: linear-gradient(135deg, #e0f7fa, #fce4ec);
-        font-family: 'Poppins', sans-serif;
-    }
     .container {
         max-width: 900px;
         margin: 50px auto;
-        background: #ffffff;
+        background: rgba(255,255,255,0.9);
         padding: 40px;
         border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        animation: fadeIn 0.6s ease-in-out;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     }
-
-    h1, h3 {
-        color: #2c3e50;
-        margin-bottom: 20px;
-    }
-
-    ul {
-        list-style-type: none;
-        padding-left: 0;
-    }
-
-    li {
-        font-size: 1.1rem;
-        margin-bottom: 10px;
-        color: #333333; /* Dark grey for good readability */
-    }
-    
-
-    img {
-        border: 2px solid #ccc;
-        border-radius: 10px;
-        margin-bottom: 30px;
-    }
-
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
+    h1, h3 { color: #2c3e50; margin-bottom: 20px; }
+    li { font-size: 1.1rem; margin-bottom: 10px; color: #333; }
+    img { border: 2px solid #ccc; border-radius: 10px; margin-bottom: 30px; width: 100%; max-width: 800px; }
 </style>
 
 <div class="container">
-    <h1>✅ Siamese Model Training Complete</h1>
+    {% if trained %}
+        <h1>✅ Training Simulation Complete</h1>
 
-    <h3>📉 Training & Validation Loss</h3>
-    <img src="{% static graph_url %}" alt="Training Graph" style="width: 100%; max-width: 800px;" />
+        <h3>📊 Model Performance</h3>
+        <ul>
+            <li><strong>Accuracy:</strong> {{ accuracy }}%</li>
+            <li><strong>Precision:</strong> {{ precision }}%</li>
+            <li><strong>Recall:</strong> {{ recall }}%</li>
+            <li><strong>AUC:</strong> {{ auc }}%</li>
+        </ul>
 
-    <h3>📌 Final Metrics</h3>
-    <p><strong>Final Training Loss:</strong> {{ train_loss|last }}</p>
-    <p><strong>Final Validation Loss:</strong> {{ val_loss|last }}</p>
+        {% if graph_url %}
+        <h3>📉 Training Graph</h3>
+        <img src="{{ graph_url }}" alt="Training Graph" />
+        {% endif %}
 
-    <h3>📊 Model Performance</h3>
-    <ul>
-        <li><strong>Accuracy:</strong> {{ accuracy|floatformat:2 }}</li>
-        <li><strong>Precision:</strong> {{ precision|floatformat:2 }}</li>
-        <li><strong>Recall:</strong> {{ recall|floatformat:2 }}</li>
-        <li><strong>F1-Score:</strong> {{ f1_score|floatformat:2 }}</li>
-    </ul>
+        {% if confusion_url %}
+        <h3>🧮 Confusion Matrix</h3>
+        <img src="{{ confusion_url }}" alt="Confusion Matrix" />
+        {% endif %}
 
-    <h3>🧮 Confusion Matrix</h3>
-    <img src="{% static confusion_matrix_url %}" alt="Confusion Matrix" style="width: 100%; max-width: 800px;" />
+    {% else %}
+        <h1>🧠 Train the Model</h1>
+        <p>Click the button below to run the training simulation.</p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" style="padding:12px 30px;background:#3b82f6;color:white;border:none;border-radius:8px;font-size:16px;cursor:pointer;">
+                Start Training
+            </button>
+        </form>
+    {% endif %}
+
+    {% if messages %}
+        {% for message in messages %}
+            <p style="color:red;">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
 </div>
 
 {% endblock %}

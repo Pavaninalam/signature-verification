@@ -19,41 +19,38 @@ from django.conf import settings
 def simulate_training():
     """
     Simulate model training and return metrics + save graph images.
-    Uses absolute paths so it works regardless of working directory.
+    Saves to MEDIA_ROOT so graphs are accessible via /media/ URL on Render.
     """
-    static_dir = settings.BASE_DIR / 'static'
-    static_dir.mkdir(exist_ok=True)
+    import os as _os
+    media_dir = settings.MEDIA_ROOT
+    _os.makedirs(str(media_dir), exist_ok=True)
 
     dataset_paths = {
         'genuine_path': 'media/signatures/full_org',
         'forged_path':  'media/signatures/full_forg',
     }
 
-    # Simulate loading + training time
-    time.sleep(3)
-    time.sleep(5)
+    time.sleep(2)  # reduced delay
 
-    # Realistic simulated metrics
     accuracy  = round(random.uniform(0.85, 0.96), 4)
     precision = round(random.uniform(0.82, 0.95), 4)
     recall    = round(random.uniform(0.80, 0.94), 4)
     auc       = round(random.uniform(0.86, 0.98), 4)
 
-    # --- Confusion matrix ---
+    # Confusion matrix
     y_true = [1, 0, 1, 0, 1, 1, 0, 1, 0, 1]
     y_pred = [1, 0, 1, 0, 0, 1, 0, 1, 1, 0]
     cm = confusion_matrix(y_true, y_pred)
-
     disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=['Forged', 'Genuine'])
     disp.plot(cmap='Blues')
-    plt.savefig(str(static_dir / 'confusion_matrix.png'))
+    cm_path = str(media_dir / 'confusion_matrix.png')
+    plt.savefig(cm_path)
     plt.close()
 
-    # --- Training graph ---
+    # Training graph
     epochs            = np.arange(1, 21)
     training_loss     = np.random.uniform(0.1, 0.5, 20)
     training_accuracy = np.random.uniform(0.6, 0.95, 20)
-
     plt.figure(figsize=(10, 6))
     plt.plot(epochs, training_loss,     label='Loss',     color='red')
     plt.plot(epochs, training_accuracy, label='Accuracy', color='blue')
@@ -62,7 +59,8 @@ def simulate_training():
     plt.ylabel('Value')
     plt.legend()
     plt.grid(True)
-    plt.savefig(str(static_dir / 'training_graph.png'))
+    graph_path = str(media_dir / 'training_graph.png')
+    plt.savefig(graph_path)
     plt.close()
 
     return {
@@ -72,4 +70,6 @@ def simulate_training():
         'precision':     precision,
         'recall':        recall,
         'auc':           auc,
+        'graph_url':     settings.MEDIA_URL + 'training_graph.png',
+        'confusion_url': settings.MEDIA_URL + 'confusion_matrix.png',
     }

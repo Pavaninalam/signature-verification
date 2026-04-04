@@ -364,13 +364,34 @@ def PredictView(request):
                 img2 = preprocess(img2_file)
                 sim  = compute_similarity(img1, img2)
                 context['result']     = sim.get('result', 'Unknown')
-                context['distance']   = sim.get('distance', 0)
-                context['similarity'] = sim.get('similarity', 0)
-                context['confidence'] = sim.get('confidence', '')
+                context['distance']   = round(sim.get('distance', 0), 4)
+                context['similarity'] = round(sim.get('similarity', 0), 2)
+                context['confidence'] = round(sim.get('confidence', 0), 2)
                 context['loss']       = round(float(sim.get('distance', 0) ** 2), 6)
         except Exception as e:
             messages.error(request, f'Prediction error: {str(e)}')
     return render(request, 'users/prediction.html', context)
+
+
+def TrainView(request):
+    if 'loginid' not in request.session:
+        return redirect('UserLogin')
+    context = {}
+    if request.method == 'POST':
+        try:
+            ctx = simulate_training()
+            context.update({
+                'trained':    ctx['trained'],
+                'accuracy':   round(ctx['accuracy'] * 100, 2),
+                'precision':  round(ctx['precision'] * 100, 2),
+                'recall':     round(ctx['recall'] * 100, 2),
+                'auc':        round(ctx['auc'] * 100, 2),
+                'graph_url':       ctx.get('graph_url', ''),
+                'confusion_url':   ctx.get('confusion_url', ''),
+            })
+        except Exception as e:
+            messages.error(request, f'Training error: {str(e)}')
+    return render(request, 'users/train_result.html', context)
 
 
 def forgot_password(request):
