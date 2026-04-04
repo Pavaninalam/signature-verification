@@ -369,8 +369,10 @@ def PredictView(request):
             if not img1_file.name.lower().endswith(('.png', '.jpg', '.jpeg')):
                 messages.error(request, "Upload JPG/PNG images only")
                 return render(request, 'users/prediction.html')
-
-            if not img2_file.name.lower().endswith(('.png', '.jpg', '.jpeg
+            img1_file.seek(0)
+            img2_file.seek(0)
+            img1 = preprocess(img1_file)
+            img2 = preprocess(img2_file)
 def TrainView(request):
     if 'loginid' not in request.session:
         return redirect('UserLogin')
