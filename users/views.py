@@ -257,35 +257,51 @@ def logout_view(request):
 
 
 def PredictView(request):
+    if 'loginid' not in request.session:
+        return redirect('UserLogin')
+
+    context = {}
+
     if request.method == 'POST':
         try:
             img1_file = request.FILES.get('image1')
             img2_file = request.FILES.get('image2')
 
             if not img1_file or not img2_file:
-                messages.error(request, "Upload both images")
+                messages.error(request, 'Please upload both images.')
                 return render(request, 'users/prediction.html')
 
+            # Reset file pointers
             img1_file.seek(0)
             img2_file.seek(0)
 
-            sim = compute_similarity(preprocess(img1_file), preprocess(img2_file))
+            # Validate format
+            if not img1_file.name.lower().endswith(('.png', '.jpg', '.jpeg')):
+                messages.error(request, 'Upload JPG/PNG images only')
+                return render(request, 'users/prediction.html')
 
-            result = {
+            # Preprocess
+            img1 = preprocess(img1_file)
+            img2 = preprocess(img2_file)
+
+            # Compute similarity
+            sim = compute_similarity(img1, img2)
+
+            loss = round(float(sim['distance']) ** 2, 6)
+
+            context.update({
                 'result': sim['result'],
                 'similarity': round(float(sim['similarity']), 2),
-                'distance': round(float(sim['distance']), 4),
+                'distance': round(float(sim['distance']), 6),
                 'confidence': round(float(sim['confidence']), 2),
-                'loss': round(float(sim['distance']) ** 2, 6)
-            }
-
-            return render(request, 'users/prediction.html', {'result': result})
+                'loss': loss,
+                'metrics': sim['metrics'],
+            })
 
         except Exception as e:
-            messages.error(request, str(e))
+            messages.error(request, f'Error: {str(e)}')
 
-    return render(request, 'users/prediction.html')
-
+    return render(request, 'users/prediction.html', context)
 
 def TrainView(request):
     context = {}
