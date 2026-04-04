@@ -1,3 +1,29 @@
+def preprocess(image_file):
+    import cv2
+    import numpy as np
+
+    try:
+        # Read image from file
+        file_bytes = np.asarray(bytearray(image_file.read()), dtype=np.uint8)
+        image = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
+
+        if image is None:
+            raise ValueError("Invalid image file")
+
+        # Resize for consistency
+        image = cv2.resize(image, (300, 150))
+
+        # Convert to grayscale
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+        # Threshold (binary image)
+        _, thresh = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY_INV)
+
+        return thresh
+
+    except Exception as e:
+        raise ValueError(f"Image preprocessing failed: {str(e)}")
+
 def compute_similarity(img1, img2):
     import numpy as np
     import cv2
