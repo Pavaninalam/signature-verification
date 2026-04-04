@@ -33,6 +33,7 @@ from .serializers import (
 from .training import simulate_training
 from .predictor import preprocess, compute_similarity
 
+
 # ---------------------------------------------------------------------------
 # JWT
 # ---------------------------------------------------------------------------
@@ -312,9 +313,9 @@ def PredictView(request):
             img1.seek(0)
             img2.seek(0)
 
-            r = compute_similarity(preprocess(img1), preprocess(img2))
+            result = compute_similarity(preprocess(img1), preprocess(img2))
 
-            return render(request, 'users/prediction.html', {'result': r})
+            return render(request, 'users/prediction.html', {'result': result})
 
         except Exception as e:
             messages.error(request, str(e))
@@ -332,3 +333,65 @@ def TrainView(request):
             messages.error(request, str(e))
 
     return render(request, 'users/train_result.html', context)
+
+
+# ---------------- FORGOT PASSWORD TEMPLATE ----------------
+
+def forgot_password(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+
+        if UserRegistrationModel.objects.filter(email=email).exists():
+            otp = random.randint(100000, 999999)
+            otp_storage[email] = otp
+
+            try:
+                send_mail(
+                    'Password Reset OTP',
+                    f'Your OTP is: {otp}',
+                    settings.DEFAULT_FROM_EMAIL,
+                    [email]
+                )
+            except:
+                pass
+
+            request.session['reset_email'] = email
+            return redirect('verify_otp')
+
+        messages.error(request, 'Email not found')
+
+    return render(request, 'users/forgot_password.html')
+
+
+def verify_otp(request):
+    if request.method == 'POST':
+        otp = request.POST.get('otp')
+        email = request.session.get('reset_email')
+
+        if str(otp_storage.get(email)) == str(otp):
+            return redirect('reset_password')
+
+        messages.error(request, 'Invalid OTP')
+
+    return render(request, 'users/verify_otp.html')
+
+
+def reset_password_view(request):
+    if request.method == 'POST':
+        email = request.session.get('reset_email')
+        new_password = request.POST.get('new_password')
+
+        try:
+            user = UserRegistrationModel.objects.get(email=email)
+            user.password = new_password
+            user.save()
+
+            otp_storage.pop(email, None)
+
+            messages.success(request, 'Password reset successful')
+            return redirect('UserLogin')
+
+        except:
+            messages.error(request, 'User not found')
+
+    return render(request, 'users/reset_password.html')
