@@ -109,11 +109,14 @@ class UserLoginView(APIView):
         if user.status != 'activated':
             return Response({'error': 'Account not activated'}, status=403)
 
+        # 🔹 Add session storage
+        request.session['loginid'] = user.loginid
+        request.session['user_name'] = user.name
+
         return Response({
             'token': generate_token(user),
             'user': {'id': user.id, 'name': user.name}
         })
-
 
 class ForgotPasswordView(APIView):
     permission_classes = [AllowAny]
