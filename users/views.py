@@ -28,13 +28,15 @@ from .serializers import (
     ResetPasswordSerializer,
     SignatureSerializer,
 )
+
 from .training import simulate_training
 from .predictor import preprocess, compute_similarity
 
-# ---------------- JWT ---------------- #
 
+# ================= JWT =================
 SECRET_KEY = settings.SECRET_KEY
 JWT_EXPIRY_HRS = 24
+
 
 def generate_token(user):
     payload = {
@@ -45,27 +47,29 @@ def generate_token(user):
     }
     return jwt.encode(payload, SECRET_KEY, algorithm='HS256')
 
+
 def decode_token(token):
     try:
         return jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
     except:
         return None
 
-# ---------------- OTP ---------------- #
 
+# ================= OTP =================
 otp_storage = {}
 
-# ---------------- SAVE IMAGE ---------------- #
 
+# ================= SAVE IMAGE =================
 def save_uploaded_image(image_file, name):
-    save_path = os.path.join(settings.MEDIA_ROOT, name)
+    path = os.path.join(settings.MEDIA_ROOT, name)
     image_file.seek(0)
-    with open(save_path, 'wb') as f:
+    with open(path, 'wb') as f:
         for chunk in image_file.chunks():
             f.write(chunk)
-    return f'{settings.MEDIA_URL}{name}'
+    return f"{settings.MEDIA_URL}{name}"
 
-# ---------------- API ---------------- #
+
+# ================= API =================
 
 class UserRegisterView(APIView):
     permission_classes = [AllowAny]
@@ -74,7 +78,7 @@ class UserRegisterView(APIView):
         serializer = UserRegistrationSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response({'message': 'Registered'}, status=201)
+            return Response({"message": "Registered successfully"}, status=201)
         return Response(serializer.errors, status=400)
 
 
@@ -91,77 +95,20 @@ class UserLoginView(APIView):
 
         try:
             user = UserRegistrationModel.objects.get(loginid=loginid)
+
+            if user.password != password:
+                raise Exception()
+
+            if user.status != "activated":
+                return Response({"error": "Not activated"}, status=403)
+
+            return Response({
+                "token": generate_token(user),
+                "user": {"id": user.id, "name": user.name}
+            })
+
         except:
-            return Response({'error': 'Invalid'}, status=401)
-
-        if user.password != password:
-            return Response({'error': 'Invalid'}, status=401)
-
-        if user.status != 'activated':
-            return Response({'error': 'Not activated'}, status=403)
-
-        return Response({'token': generate_token(user)})
-
-
-class ForgotPasswordView(APIView):
-    permission_classes = [AllowAny]
-
-    def post(self, request):
-        serializer = ForgotPasswordSerializer(data=request.data)
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=400)
-
-        email = serializer.validated_data['email']
-
-        if not UserRegistrationModel.objects.filter(email=email).exists():
-            return Response({'error': 'Email not found'}, status=404)
-
-        otp = random.randint(100000, 999999)
-        otp_storage[email] = otp
-
-        try:
-            send_mail("OTP", f"Your OTP: {otp}", settings.DEFAULT_FROM_EMAIL, [email])
-        except:
-            pass
-
-        return Response({'message': 'OTP sent'})
-
-
-class VerifyOTPView(APIView):
-    permission_classes = [AllowAny]
-
-    def post(self, request):
-        serializer = VerifyOTPSerializer(data=request.data)
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=400)
-
-        email = serializer.validated_data['email']
-        otp = serializer.validated_data['otp']
-
-        if otp_storage.get(email) and str(otp_storage[email]) == str(otp):
-            return Response({'message': 'Verified'})
-        return Response({'error': 'Invalid OTP'}, status=400)
-
-
-class ResetPasswordView(APIView):
-    permission_classes = [AllowAny]
-
-    def post(self, request):
-        serializer = ResetPasswordSerializer(data=request.data)
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=400)
-
-        email = serializer.validated_data['email']
-        new_pass = serializer.validated_data['new_password']
-
-        try:
-            user = UserRegistrationModel.objects.get(email=email)
-            user.password = new_pass
-            user.save()
-            otp_storage.pop(email, None)
-            return Response({'message': 'Password reset'})
-        except:
-            return Response({'error': 'User not found'}, status=404)
+            return Response({"error": "Invalid login"}, status=401)
 
 
 class PredictionView(APIView):
@@ -174,20 +121,37 @@ class PredictionView(APIView):
             img2_file = request.FILES.get('image2')
 
             if not img1_file or not img2_file:
-                return Response({'error': 'Upload both images'}, status=400)
+                return Response({"error": "Upload both images"}, status=400)
 
+            # MOBILE FIX
             img1_file.seek(0)
             img2_file.seek(0)
+
+            # FORMAT CHECK
+            if not img1_file.name.lower().endswith(('.png', '.jpg', '.jpeg')):
+                return Response({"error": "Only JPG/PNG allowed"}, status=400)
+
+            if not img2_file.name.lower().endswith(('.png', '.jpg', '.jpeg')):
+                return Response({"error": "Only JPG/PNG allowed"}, status=400)
 
             img1 = preprocess(img1_file)
             img2 = preprocess(img2_file)
 
             sim = compute_similarity(img1, img2)
 
-            return Response(sim)
+            img1_url = save_uploaded_image(img1_file, "img1.png")
+            img2_url = save_uploaded_image(img2_file, "img2.png")
+
+            return Response({
+                "result": sim['result'],
+                "similarity": sim['similarity'],
+                "confidence": sim['confidence'],
+                "img1": img1_url,
+                "img2": img2_url
+            })
 
         except Exception as e:
-            return Response({'error': str(e)}, status=500)
+            return Response({"error": str(e)}, status=500)
 
 
 class SimulateTrainingView(APIView):
@@ -198,41 +162,68 @@ class SimulateTrainingView(APIView):
             ctx = simulate_training()
             return Response(ctx)
         except Exception as e:
-            return Response({'error': str(e)})
+            return Response({"error": str(e)}, status=500)
 
-# ---------------- TEMPLATE ---------------- #
+
+# ================= TEMPLATE VIEWS =================
 
 def index_view(request):
     return render(request, 'index.html')
 
 
-def UserLoginCheck(request):
-    if request.method == 'POST':
-        loginid = request.POST.get('loginid')
-        password = request.POST.get('pswd')
-
+def UserRegisterFormView(request):
+    if request.method == "POST":
         try:
-            user = UserRegistrationModel.objects.get(loginid=loginid)
+            loginid = request.POST.get('loginid')
 
-            if user.password != password:
-                raise Exception()
+            if UserRegistrationModel.objects.filter(loginid=loginid).exists():
+                messages.error(request, "User exists")
+                return render(request, 'UserRegistrations.html')
 
-            if user.status != 'activated':
-                messages.error(request, 'Not activated')
-                return render(request, 'UserLogin.html')
+            user = UserRegistrationModel(
+                name=request.POST.get('name'),
+                loginid=loginid,
+                password=request.POST.get('password'),
+                email=request.POST.get('email'),
+                status='waiting'
+            )
+            user.save()
+
+            messages.success(request, "Registered successfully")
+            return redirect('UserLogin')
+
+        except Exception as e:
+            messages.error(request, str(e))
+
+    return render(request, 'UserRegistrations.html')
+
+
+def UserLogin(request):
+    return render(request, 'UserLogin.html')
+
+
+def UserLoginCheck(request):
+    if request.method == "POST":
+        try:
+            user = UserRegistrationModel.objects.get(
+                loginid=request.POST.get('loginid'),
+                password=request.POST.get('pswd')
+            )
+
+            if user.status != "activated":
+                messages.error(request, "Not activated")
+                return redirect('UserLogin')
 
             request.session['loginid'] = user.loginid
             return redirect('UserHome')
 
         except:
-            messages.error(request, 'Invalid login')
+            messages.error(request, "Invalid login")
 
     return render(request, 'UserLogin.html')
 
 
 def UserHome(request):
-    if 'loginid' not in request.session:
-        return redirect('UserLogin')
     return render(request, 'users/UserHomePage.html')
 
 
@@ -241,65 +232,41 @@ def logout_view(request):
     return redirect('index')
 
 
-# 🔥 FULL FIXED PREDICT VIEW
-
 def PredictView(request):
-    if 'loginid' not in request.session:
-        return redirect('UserLogin')
-
-    context = {}
-
-    if request.method == 'POST':
+    if request.method == "POST":
         try:
-            img1_file = request.FILES.get('image1')
-            img2_file = request.FILES.get('image2')
+            img1 = request.FILES.get('image1')
+            img2 = request.FILES.get('image2')
 
-            if img1_file:
-                img1_file.seek(0)
-            if img2_file:
-                img2_file.seek(0)
+            if not img1 or not img2:
+                messages.error(request, "Upload both images")
+                return render(request, 'users/prediction.html')
 
-            if not img1_file or not img2_file:
-                messages.error(request, 'Please upload both images.')
-                return render(request, 'users/prediction.html', context)
+            img1.seek(0)
+            img2.seek(0)
 
-            if not img1_file.name.lower().endswith(('.png', '.jpg', '.jpeg')):
-                messages.error(request, "Upload JPG/PNG only")
-                return render(request, 'users/prediction.html', context)
+            img1_p = preprocess(img1)
+            img2_p = preprocess(img2)
 
-            if not img2_file.name.lower().endswith(('.png', '.jpg', '.jpeg')):
-                messages.error(request, "Upload JPG/PNG only")
-                return render(request, 'users/prediction.html', context)
+            sim = compute_similarity(img1_p, img2_p)
 
-            img1_file.seek(0)
-            img2_file.seek(0)
-
-            img1 = preprocess(img1_file)
-            img2 = preprocess(img2_file)
-
-            sim = compute_similarity(img1, img2)
-
-            context['result'] = sim.get('result')
-            context['similarity'] = sim.get('similarity')
-            context['confidence'] = sim.get('confidence')
-            context['distance'] = sim.get('distance')
+            return render(request, 'users/prediction.html', {
+                "result": sim['result'],
+                "similarity": sim['similarity']
+            })
 
         except Exception as e:
-            messages.error(request, f"Error: {str(e)}")
+            messages.error(request, str(e))
 
-    return render(request, 'users/prediction.html', context)
+    return render(request, 'users/prediction.html')
 
 
 def TrainView(request):
-    if 'loginid' not in request.session:
-        return redirect('UserLogin')
-
     context = {}
-
-    if request.method == 'POST':
+    if request.method == "POST":
         try:
             ctx = simulate_training()
-            context['accuracy'] = ctx['accuracy']
+            context = ctx
         except Exception as e:
             messages.error(request, str(e))
 
