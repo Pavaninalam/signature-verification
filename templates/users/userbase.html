@@ -126,11 +126,10 @@
     <!-- Sidebar (Navigation Bar) -->
     <nav>
         <ul>
-            <li><a href="{% url 'UserHome' %}" class="{% if request.path == '/UserHome/' %}active{% endif %}">Home</a></li>
-            {% comment %} <li><a href="{% url 'training' %}" class="{% if request.path == '/training/' %}active{% endif %}">Training</a></li> {% endcomment %}
-            <li><a href="{% url 'simulate_training' %}" class="{% if request.path == '/training/' %}active{% endif %}">Training</a></li>
-            <li><a href="{% url 'prediction1' %}" class="{% if request.path == '/prediction/' %}active{% endif %}">Verification</a></li>
-            <li><a href="{% url 'logout' %}" class="{% if request.path == '/index/' %}active{% endif %}">Logout</a></li>
+            <li><a href="{% url 'UserHome' %}">Home</a></li>
+            <li><a href="{% url 'train' %}">Training</a></li>
+            <li><a href="{% url 'predict' %}">Verification</a></li>
+            <li><a href="{% url 'logout' %}">Logout</a></li>
         </ul>
     </nav>
 
