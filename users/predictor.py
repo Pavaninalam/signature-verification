@@ -67,7 +67,7 @@ def compute_similarity(img1, img2):
         # -----------------------------
         # 🔥 FINAL DECISION (FIXED)
         # -----------------------------
-        if similarity >= 75 and distance < 0.15:
+        if similarity >= 80 and distance < 0.10:
             result = "MATCH  ✅"
         else:
             result = "NOT MATCH  ❌"
