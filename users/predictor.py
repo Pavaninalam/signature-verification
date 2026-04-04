@@ -1,28 +1,68 @@
-from PIL import Image
-import numpy as np
-import cv2
-
-def preprocess(image_file):
-    img = Image.open(image_file).convert('L')
-    img = np.array(img)
-    img = cv2.resize(img, (300, 150))
-    _, img = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
-    return img
-
-
 def compute_similarity(img1, img2):
-    diff = cv2.absdiff(img1, img2)
-    score = np.sum(diff) / (300 * 150)
+    import numpy as np
+    import cv2
+    from skimage.metrics import structural_similarity as ssim
 
-    if score < 50:
-        result = "Matched ✅"
-    else:
-        result = "Not Matched ❌"
+    try:
+        # Resize images to same size
+        img1 = cv2.resize(img1, (300, 150))
+        img2 = cv2.resize(img2, (300, 150))
 
-    return {
-        "result": result,
-        "distance": float(score),
-        "similarity": float(100 - score),
-        "confidence": float(max(0, 100 - score)),
-        "metrics": {"diff_score": float(score)}
-    }
+        # Convert to grayscale
+        if len(img1.shape) == 3:
+            img1 = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
+        if len(img2.shape) == 3:
+            img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
+
+        # -----------------------------
+        # 1. SSIM (Structural Similarity)
+        # -----------------------------
+        score, _ = ssim(img1, img2, full=True)
+        ssim_score = float(score)  # 0 to 1
+
+        # -----------------------------
+        # 2. MSE (Mean Squared Error)
+        # -----------------------------
+        mse = np.mean((img1.astype("float") - img2.astype("float")) ** 2)
+
+        # Normalize distance
+        distance = mse / (255.0 * 255.0)
+
+        # -----------------------------
+        # 3. Similarity %
+        # -----------------------------
+        similarity = ssim_score * 100
+
+        # -----------------------------
+        # 4. Confidence Score
+        # -----------------------------
+        confidence = similarity - (distance * 50)
+
+        # -----------------------------
+        # 🔥 FINAL DECISION (FIXED)
+        # -----------------------------
+        if similarity >= 75 and distance < 0.15:
+            result = "MATCH"
+        else:
+            result = "NOT MATCH"
+
+        return {
+            "result": result,
+            "similarity": round(similarity, 2),
+            "distance": round(distance, 4),
+            "confidence": round(confidence, 2),
+            "metrics": {
+                "ssim": round(ssim_score, 4),
+                "mse": round(float(mse), 4),
+            }
+        }
+
+    except Exception as e:
+        return {
+            "result": "ERROR",
+            "similarity": 0,
+            "distance": 0,
+            "confidence": 0,
+            "metrics": {},
+            "error": str(e)
+        }
