@@ -350,29 +350,45 @@ def logout_view(request):
 
 
 def PredictView(request):
-    if 'loginid' not in request.session:
-        return redirect('UserLogin')
-    context = {}
     if request.method == 'POST':
-        try:
-            img1_file = request.FILES.get('image1')
-            img2_file = request.FILES.get('image2')
-            if not img1_file or not img2_file:
-                messages.error(request, 'Please upload both images.')
-            else:
-                img1 = preprocess(img1_file)
-                img2 = preprocess(img2_file)
-                sim  = compute_similarity(img1, img2)
-                context['result']     = sim.get('result', 'Unknown')
-                context['distance']   = round(sim.get('distance', 0), 4)
-                context['similarity'] = round(sim.get('similarity', 0), 2)
-                context['confidence'] = round(sim.get('confidence', 0), 2)
-                context['loss']       = round(float(sim.get('distance', 0) ** 2), 6)
-        except Exception as e:
-            messages.error(request, f'Prediction error: {str(e)}')
-    return render(request, 'users/prediction.html', context)
+    try:
+        img1_file = request.FILES.get('image1')
+        img2_file = request.FILES.get('image2')
 
+        # ✅ Reset file pointer (mobile fix)
+        if img1_file:
+            img1_file.seek(0)
+        if img2_file:
+            img2_file.seek(0)
 
+        # ❌ If files missing
+        if not img1_file or not img2_file:
+            messages.error(request, 'Please upload both images.')
+            return render(request, 'users/prediction.html')
+
+        # ✅ FILE FORMAT VALIDATION (ADD HERE)
+        if not img1_file.name.lower().endswith(('.png', '.jpg', '.jpeg')):
+            messages.error(request, "Upload JPG/PNG images only")
+            return render(request, 'users/prediction.html')
+
+        if not img2_file.name.lower().endswith(('.png', '.jpg', '.jpeg')):
+            messages.error(request, "Upload JPG/PNG images only")
+            return render(request, 'users/prediction.html')
+
+        # ✅ THEN PROCESS
+        img1 = preprocess(img1_file)
+        img2 = preprocess(img2_file)
+
+        sim = compute_similarity(img1, img2)
+
+        context['result']     = sim.get('result', 'Unknown')
+        context['distance']   = round(sim.get('distance', 0), 4)
+        context['similarity'] = round(sim.get('similarity', 0), 2)
+        context['confidence'] = round(sim.get('confidence', 0), 2)
+        context['loss']       = round(float(sim.get('distance', 0) ** 2), 6)
+
+    except Exception as e:
+        messages.error(request, f'Prediction error: {str(e)}')
 def TrainView(request):
     if 'loginid' not in request.session:
         return redirect('UserLogin')

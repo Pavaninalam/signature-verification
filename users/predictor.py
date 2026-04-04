@@ -3,20 +3,25 @@ def preprocess(image_file):
     import numpy as np
 
     try:
-        # Read image from file
-        file_bytes = np.asarray(bytearray(image_file.read()), dtype=np.uint8)
+        # ✅ FIX 1: reset pointer
+        image_file.seek(0)
+
+        # ✅ FIX 2: read safely
+        file_bytes = np.frombuffer(image_file.read(), np.uint8)
+
+        # Decode image
         image = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
 
         if image is None:
-            raise ValueError("Invalid image file")
+            raise ValueError("Invalid image format or corrupted file")
 
-        # Resize for consistency
+        # Resize
         image = cv2.resize(image, (300, 150))
 
-        # Convert to grayscale
+        # Grayscale
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-        # Threshold (binary image)
+        # Threshold
         _, thresh = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY_INV)
 
         return thresh
