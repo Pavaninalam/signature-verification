@@ -304,32 +304,33 @@ def PredictView(request):
     context = {}
     if request.method == 'POST':
         try:
+            # 1️⃣ Get uploaded files
             img1 = request.FILES.get('image1')
             img2 = request.FILES.get('image2')
 
             if not img1 or not img2:
-                messages.error(request, "Upload both images")
+                messages.error(request, "Please upload both images")
                 return render(request, 'users/prediction.html')
 
-            # Reset file pointers
+            # 2️⃣ Reset file pointers
             img1.seek(0)
             img2.seek(0)
 
-            # Compute similarity
+            # 3️⃣ Preprocess and compute similarity
             result = compute_similarity(preprocess(img1), preprocess(img2))
 
-            # Prepare context for template
+            # 4️⃣ Prepare context for template display
             context = {
-                'result_text': result['result'],
-                'similarity': result['similarity'],
-                'distance': result['distance'],
-                'confidence': result['confidence'],
-                'loss': round(result['distance'] ** 2, 6),
+                'result_text': result.get('result', 'ERROR'),
+                'similarity': result.get('similarity', 0),
+                'distance': result.get('distance', 0),
+                'confidence': result.get('confidence', 0),
+                'loss': round(result.get('distance', 0)**2, 6),
                 'metrics': result.get('metrics', {}),
             }
 
         except Exception as e:
-            messages.error(request, str(e))
+            messages.error(request, f"Prediction failed: {str(e)}")
 
     return render(request, 'users/prediction.html', context)
 

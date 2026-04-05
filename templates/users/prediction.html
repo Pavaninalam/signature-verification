@@ -71,13 +71,19 @@
         <button type="submit">Check Match</button>
     </form>
 
-    {% if result %}
+    {% if result_text %}
     <div class="result-box">
-        <h2>{{ result }}</h2>
+        <h2>{{ result_text }}</h2>
         <p><strong>Similarity:</strong> {{ similarity|floatformat:2 }}%</p>
         <p><strong>Distance:</strong> {{ distance }}</p>
-        <p><strong>Confidence:</strong> {{ confidence }}</p>
-        <p><strong>Loss:</strong> {{ loss }}</p>
+        <p><strong>Confidence:</strong> {{ confidence|floatformat:2 }}</p>
+        <p><strong>Loss:</strong> {{ loss|floatformat:6 }}</p>
+
+        {% if metrics %}
+        <h4>Metrics:</h4>
+        <p>SSIM: {{ metrics.ssim|floatformat:4 }}</p>
+        <p>MSE: {{ metrics.mse|floatformat:4 }}</p>
+        {% endif %}
     </div>
     {% endif %}
 </div>
