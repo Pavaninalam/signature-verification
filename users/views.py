@@ -190,53 +190,42 @@ class ResetPasswordView(APIView):
 
 
 
-def PredictionView(request):
-    context = {}
-    if request.method == 'POST':
+# users/views.py
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
+from rest_framework.parsers import MultiPartParser, FormParser
+from .predictor import preprocess, compute_similarity
+from .views_helpers import decode_token  # if you use token auth
+
+class PredictionView(APIView):
+    parser_classes = [MultiPartParser, FormParser]
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        auth = request.headers.get('Authorization', '')
+        if not auth.startswith('Bearer '):
+            return Response({'error': 'Login required'}, status=401)
+
+        if decode_token(auth.split(' ')[1]) is None:
+            return Response({'error': 'Invalid token'}, status=401)
+
         try:
-            # --- Desktop / Web ---
             img1 = request.FILES.get('image1')
             img2 = request.FILES.get('image2')
 
-            # --- Mobile (base64) fallback ---
-            if not img1 and not img2:
-                img1_base64 = request.POST.get('image1_base64')
-                img2_base64 = request.POST.get('image2_base64')
+            if not img1 or not img2:
+                return Response({'error': 'Upload both images'}, status=400)
 
-                if img1_base64 and img2_base64:
-                    img1 = InMemoryUploadedFile(
-                        BytesIO(base64.b64decode(img1_base64)),
-                        None, 'image1.png', 'image/png', len(base64.b64decode(img1_base64)), None
-                    )
-                    img2 = InMemoryUploadedFile(
-                        BytesIO(base64.b64decode(img2_base64)),
-                        None, 'image2.png', 'image/png', len(base64.b64decode(img2_base64)), None
-                    )
-                else:
-                    messages.error(request, "Upload both images")
-                    return render(request, 'users/prediction.html')
+            i1 = preprocess(img1)
+            i2 = preprocess(img2)
 
-            # Reset pointer
-            img1.seek(0)
-            img2.seek(0)
-
-            # Compute similarity
-            result = compute_similarity(preprocess(img1), preprocess(img2))
-
-            context = {
-                'result_text': result.get('result', 'ERROR'),
-                'similarity': result.get('similarity', 0),
-                'distance': result.get('distance', 0),
-                'confidence': result.get('confidence', 0),
-                'loss': round(result.get('distance', 0)**2, 6),
-                'metrics': result.get('metrics', {}),
-            }
+            sim = compute_similarity(i1, i2)
+            return Response(sim)
 
         except Exception as e:
-            messages.error(request, f"Prediction failed: {str(e)}")
-
-    return render(request, 'users/prediction.html', context)
-
+            return Response({'error': str(e)}, status=500)
 
 class SimulateTrainingView(APIView):
     permission_classes = [AllowAny]
