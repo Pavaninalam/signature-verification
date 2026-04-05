@@ -16,27 +16,52 @@ export default function PredictionScreen() {
   const [error,   setError]   = useState("");
 
   const pickImage = async (setter) => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== "granted") {
-      Alert.alert("Permission needed", "Allow photo library access."); return;
+    try {
+      // Request permission — on Android 13+ this may auto-grant
+      const permResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (permResult.status === "denied" && !permResult.canAskAgain) {
+        Alert.alert(
+          "Permission Required",
+          "Photo library access was denied. Please enable it in Settings → Apps → SigVerify → Permissions.",
+          [{ text: "OK" }]
+        );
+        return;
+      }
+
+      const res = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: false,
+        quality: 0.8,
+      });
+
+      if (!res.canceled && res.assets && res.assets.length > 0) {
+        setter(res.assets[0]);
+      }
+    } catch (e) {
+      Alert.alert("Error", "Could not open photo library: " + e.message);
     }
-    const res = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images"],   // SDK 54 — array syntax, MediaTypeOptions removed
-      quality: 0.9,
-    });
-    if (!res.canceled && res.assets?.[0]) setter(res.assets[0]);
   };
 
   const takePhoto = async (setter) => {
-    const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    if (status !== "granted") {
-      Alert.alert("Permission needed", "Allow camera access."); return;
+    try {
+      const permResult = await ImagePicker.requestCameraPermissionsAsync();
+      if (permResult.status !== "granted") {
+        Alert.alert("Permission Required", "Camera access is needed to take photos.");
+        return;
+      }
+
+      const res = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: false,
+        quality: 0.8,
+      });
+
+      if (!res.canceled && res.assets && res.assets.length > 0) {
+        setter(res.assets[0]);
+      }
+    } catch (e) {
+      Alert.alert("Error", "Could not open camera: " + e.message);
     }
-    const res = await ImagePicker.launchCameraAsync({
-      mediaTypes: ["images"],
-      quality: 0.9,
-    });
-    if (!res.canceled && res.assets?.[0]) setter(res.assets[0]);
   };
 
   const showPicker = (setter) => {
