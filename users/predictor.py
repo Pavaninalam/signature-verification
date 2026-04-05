@@ -1,124 +1,76 @@
-# users/predictor.py
-
 import cv2
 import numpy as np
-from skimage.metrics import structural_similarity as ssim
+from skimage.metrics import structural_similarity as ssim_metric
 
-# ------------------------------
-# Helper: Convert np types to float
-# ------------------------------
-def to_float(val):
-    if isinstance(val, (np.float32, np.float64, np.int32, np.int64)):
-        return float(val)
-    return val
 
-def convert_np(obj):
-    """Recursively convert NumPy types in dict/list to Python float/int."""
-    if isinstance(obj, dict):
-        return {k: convert_np(v) for k, v in obj.items()}
-    elif isinstance(obj, list):
-        return [convert_np(x) for x in obj]
-    else:
-        return to_float(obj)
-
-# ------------------------------
-# Preprocess image
-# ------------------------------
 def preprocess(image_file):
-    """
-    Preprocess uploaded image for signature verification.
-    Steps: read, resize, grayscale, threshold.
-    """
-    try:
-        # Reset pointer
-        image_file.seek(0)
+    """Read uploaded image → grayscale uint8 (300x150) with thresholding."""
+    image_file.seek(0)
+    file_bytes = np.frombuffer(image_file.read(), np.uint8)
+    image = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
+    if image is None:
+        raise ValueError("Cannot decode image. Upload a valid PNG or JPG file.")
+    image = cv2.resize(image, (300, 150))
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    gray = cv2.GaussianBlur(gray, (3, 3), 0)
+    return gray
 
-        # Read bytes safely
-        file_bytes = np.frombuffer(image_file.read(), np.uint8)
-        image = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
 
-        if image is None:
-            raise ValueError("Invalid image format or corrupted file")
-
-        # Resize to consistent dimensions
-        image = cv2.resize(image, (300, 150))
-
-        # Convert to grayscale
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-
-        # Threshold (invert for black ink)
-        _, thresh = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY_INV)
-
-        return thresh
-
-    except Exception as e:
-        raise ValueError(f"Image preprocessing failed: {str(e)}")
-
-# ------------------------------
-# Compute similarity between two images
-# ------------------------------
 def compute_similarity(img1, img2):
     """
-    Compare two preprocessed images and return:
-    - SSIM, MSE, distance, similarity %, confidence
-    - Final decision: MATCH or NOT MATCH
+    Compare two preprocessed images.
+
+    Returns a dict with:
+      result     : "Match" or "No Match"   ← matches frontend check exactly
+      similarity : float [0, 1]            ← frontend multiplies by 100 for display
+      distance   : float [0, 1]            ← 0 = identical, 1 = completely different
+      confidence : "High" / "Medium" / "Low"
+      loss       : float (distance squared)
+      metrics    : { ssim: float }
     """
-    try:
-        # Ensure same size
-        img1 = cv2.resize(img1, (300, 150))
-        img2 = cv2.resize(img2, (300, 150))
+    img1 = cv2.resize(img1, (300, 150))
+    img2 = cv2.resize(img2, (300, 150))
 
-        # Convert to grayscale if needed
-        if len(img1.shape) == 3:
-            img1 = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
-        if len(img2.shape) == 3:
-            img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
+    if len(img1.shape) == 3:
+        img1 = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
+    if len(img2.shape) == 3:
+        img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
 
-        # 1️⃣ SSIM
-        score, _ = ssim(img1, img2, full=True)
-        ssim_score = float(score)
+    # SSIM — range [-1, 1], clamp to [0, 1]
+    score, _ = ssim_metric(img1, img2, full=True)
+    ssim_score = float(max(0.0, min(1.0, score)))
 
-        # 2️⃣ MSE
-        mse = np.mean((img1.astype("float") - img2.astype("float")) ** 2)
+    # MSE normalised to [0, 1]
+    mse = float(np.mean((img1.astype("float32") - img2.astype("float32")) ** 2))
+    distance = round(mse / (255.0 ** 2), 6)
 
-        # 3️⃣ Normalized distance
-        distance = mse / (255.0 * 255.0)
+    # Similarity in [0, 1] — frontend does `(similarity * 100).toFixed(1)` for display
+    similarity = round(ssim_score, 6)
 
-        # 4️⃣ Similarity %
-        similarity = ssim_score * 100
+    # Loss
+    loss = round(distance ** 2, 6)
 
-        # 5️⃣ Confidence score
-        confidence = similarity - (distance * 50)
+    # Decision: SSIM >= 0.75 AND distance < 0.08 → Match
+    is_match = ssim_score >= 0.75 and distance < 0.08
 
-        # 6️⃣ Final decision
-        if similarity >= 80 and distance < 0.10:
-            result = "MATCH ✅"
-        else:
-            result = "NOT MATCH ❌"
+    # Confidence
+    margin = abs(ssim_score - 0.75)
+    if margin >= 0.15:
+        confidence = "High"
+    elif margin >= 0.07:
+        confidence = "Medium"
+    else:
+        confidence = "Low"
 
-        # Prepare JSON
-        sim_dict = {
-            "result": result,
-            "similarity": round(similarity, 2),
-            "distance": round(distance, 4),
-            "confidence": round(confidence, 2),
-            "metrics": {
-                "ssim": round(ssim_score, 4),
-                "mse": round(float(mse), 4),
-            }
-        }
-
-        # Convert all NumPy types to float
-        sim_dict = convert_np(sim_dict)
-
-        return sim_dict
-
-    except Exception as e:
-        return {
-            "result": "ERROR",
-            "similarity": 0,
-            "distance": 0,
-            "confidence": 0,
-            "metrics": {},
-            "error": str(e)
-        }
+    return {
+        "result":     "Match" if is_match else "No Match",
+        "similarity": similarity,
+        "distance":   distance,
+        "confidence": confidence,
+        "loss":       loss,
+        "metrics": {
+            "ssim":            round(ssim_score, 4),
+            "model_available": False,
+            "model_distance":  None,
+        },
+    }
