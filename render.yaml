@@ -2,6 +2,7 @@ services:
   - type: web
     name: sigverify-backend
     runtime: python
+    pythonVersion: "3.11.9"
     buildCommand: "./build.sh"
     startCommand: "gunicorn Signature_Verification.wsgi:application --bind 0.0.0.0:$PORT --workers 1 --timeout 120"
     envVars:
@@ -13,5 +14,3 @@ services:
         value: admin
       - key: ADMIN_PASSWORD
         value: admin
-      - key: PYTHON_VERSION
-        value: "3.11.0"
