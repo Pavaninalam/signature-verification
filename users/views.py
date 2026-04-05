@@ -301,6 +301,7 @@ def logout_view(request):
 
 
 def PredictView(request):
+    context = {}
     if request.method == 'POST':
         try:
             img1 = request.FILES.get('image1')
@@ -310,18 +311,27 @@ def PredictView(request):
                 messages.error(request, "Upload both images")
                 return render(request, 'users/prediction.html')
 
+            # Reset file pointers
             img1.seek(0)
             img2.seek(0)
 
+            # Compute similarity
             result = compute_similarity(preprocess(img1), preprocess(img2))
 
-            return render(request, 'users/prediction.html', {'result': result})
+            # Prepare context for template
+            context = {
+                'result_text': result['result'],
+                'similarity': result['similarity'],
+                'distance': result['distance'],
+                'confidence': result['confidence'],
+                'loss': round(result['distance'] ** 2, 6),
+                'metrics': result.get('metrics', {}),
+            }
 
         except Exception as e:
             messages.error(request, str(e))
 
-    return render(request, 'users/prediction.html')
-
+    return render(request, 'users/prediction.html', context)
 
 def TrainView(request):
     context = {}
