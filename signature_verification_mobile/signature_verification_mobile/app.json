@@ -1,0 +1,49 @@
+{
+  "expo": {
+    "name": "SigVerify",
+    "slug": "signature_verification_mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": false,
+    "splash": {
+      "image": "./assets/images/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0f0c29"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.pavaninalam.sigverify"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "backgroundColor": "#0f0c29"
+      },
+      "package": "com.pavaninalam.sigverify",
+      "usesCleartextTraffic": true,
+      "permissions": [
+        "android.permission.INTERNET",
+        "android.permission.ACCESS_NETWORK_STATE",
+        "android.permission.CAMERA",
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.READ_EXTERNAL_STORAGE"
+      ]
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow SigVerify to access your photos for signature upload.",
+          "cameraPermission": "Allow SigVerify to use the camera to capture signatures."
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "5beb9325-3097-4244-8247-2f470a14016c"
+      }
+    }
+  }
+}
