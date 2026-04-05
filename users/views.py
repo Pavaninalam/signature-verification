@@ -190,7 +190,7 @@ class ResetPasswordView(APIView):
 
 
 
-def PredictView(request):
+def PredictionView(request):
     context = {}
     if request.method == 'POST':
         try:
