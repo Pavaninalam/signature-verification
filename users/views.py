@@ -190,15 +190,6 @@ class ResetPasswordView(APIView):
 
 
 
-# users/views.py
-
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
-from rest_framework.parsers import MultiPartParser, FormParser
-from .predictor import preprocess, compute_similarity
-from .views_helpers import decode_token  # if you use token auth
-
 class PredictionView(APIView):
     parser_classes = [MultiPartParser, FormParser]
     permission_classes = [AllowAny]
