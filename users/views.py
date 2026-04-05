@@ -304,22 +304,19 @@ def PredictView(request):
     context = {}
     if request.method == 'POST':
         try:
-            # 1️⃣ Get uploaded files
             img1 = request.FILES.get('image1')
             img2 = request.FILES.get('image2')
 
             if not img1 or not img2:
-                messages.error(request, "Please upload both images")
+                messages.error(request, "Upload both images")
                 return render(request, 'users/prediction.html')
 
-            # 2️⃣ Reset file pointers
             img1.seek(0)
             img2.seek(0)
 
-            # 3️⃣ Preprocess and compute similarity
             result = compute_similarity(preprocess(img1), preprocess(img2))
 
-            # 4️⃣ Prepare context for template display
+            # 👇 Unpack dict into template-friendly variables
             context = {
                 'result_text': result.get('result', 'ERROR'),
                 'similarity': result.get('similarity', 0),
