@@ -51,7 +51,7 @@ def compute_similarity(img1, img2):
     loss = round(distance ** 2, 6)
 
     # Decision: SSIM >= 0.75 AND distance < 0.08 → Match
-    is_match = ssim_score >= 0.75 and distance < 0.08
+    is_match = ssim_score >= 0.90 and distance < 0.02
 
     # Confidence
     margin = abs(ssim_score - 0.75)
@@ -63,7 +63,7 @@ def compute_similarity(img1, img2):
         confidence = "Low"
 
     return {
-        "result":     "Match" if is_match else "No Match",
+        "result":     "Match ✔️" if is_match else "No Match ❌ ",
         "similarity": similarity,
         "distance":   distance,
         "confidence": confidence,
